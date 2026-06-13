@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>中国城市互动地图</title>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(circle at center, #102a44, #020611);
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  color: white;
+}
+
+h1 {
+  text-align: center;
+  margin: 24px 0 5px;
+  color: #7df9ff;
+  text-shadow: 0 0 15px #00eaff;
+  letter-spacing: 3px;
+}
+
+.map {
+  position: relative;
+  width: 1000px;
+  height: 720px;
+  margin: 20px auto;
+  border: 1px solid rgba(0,255,255,.4);
+  box-shadow: 0 0 35px rgba(0,255,255,.35);
+  background: radial-gradient(circle at center, #0b314c, #020611);
+  overflow: hidden;
+}
+
+#chinaMap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.city {
+  position: absolute;
+  z-index: 5;
+  padding: 5px 10px;
+  border: 1px solid #00eaff;
+  border-radius: 16px;
+  background: rgba(0, 25, 45, 0.8);
+  color: #bfffff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.25s;
+  box-shadow: 0 0 10px rgba(0,255,255,.5);
+}
+
+.city:hover {
+  background: #00eaff;
+  color: #00111f;
+  transform: scale(1.25);
+  z-index: 20;
+  box-shadow: 0 0 25px #00eaff;
+}
+
+.super {
+  border-color: #ffdd55;
+  color: #ffec99;
+  box-shadow: 0 0 15px rgba(255,221,85,.8);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.78);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.card {
+  width: 720px;
+  background: #071522;
+  border: 1px solid #00eaff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 0 35px #00eaff;
+  text-align: center;
+}
+
+.card img {
+  max-width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+.close {
+  margin-top: 15px;
+  padding: 10px 26px;
+  border: none;
+  border-radius: 20px;
+  background: #00eaff;
+  cursor: pointer;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>中国超一线与新一线城市互动地图</h1>
+
+<div class="map" id="map">
+  <div id="chinaMap"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="card">
+    <h2 id="cityTitle"></h2>
+    <img id="cityImage" src="" alt="">
+    <p id="cityDesc"></p>
+    <button class="close" onclick="closeModal()">关闭</button>
+  </div>
+</div>
+
+<script>
+const chart = echarts.init(document.getElementById("chinaMap"));
+
+fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json")
+  .then(res => res.json())
+  .then(chinaJson => {
+    echarts.registerMap("china", chinaJson);
+
+    chart.setOption({
+      geo: {
+        map: "china",
+        roam: false,
+        zoom: 1.2,
+        center: [104, 35],
+        itemStyle: {
+          areaColor: "rgba(0, 80, 120, 0.45)",
+          borderColor: "#00eaff",
+          borderWidth: 1.2,
+          shadowColor: "#00eaff",
+          shadowBlur: 12
+        },
+        emphasis: {
+          itemStyle: {
+            areaColor: "rgba(0, 220, 255, 0.35)"
+          },
+          label: {
+            show: false
+          }
+        },
+        label: {
+          show: false
+        }
+      }
+    });
+  });
+
+const cities = [
+  { name: "北京", type: "super", x: 690, y: 255, img: "assets/beijing.jpg", desc: "空姐在故宫前开心合影。" },
+  { name: "上海", type: "super", x: 770, y: 430, img: "assets/shanghai.jpg", desc: "空姐在外滩前开心合影。" },
+  { name: "广州", type: "super", x: 630, y: 590, img: "assets/guangzhou.jpg", desc: "空姐在广州塔前开心合影。" },
+  { name: "深圳", type: "super", x: 650, y: 620, img: "assets/shenzhen.jpg", desc: "空姐在深圳湾开心合影。" },
+
+  { name: "成都", x: 465, y: 455, img: "assets/chengdu.jpg", desc: "空姐在宽窄巷子开心合影。" },
+  { name: "杭州", x: 755, y: 465, img: "assets/hangzhou.jpg", desc: "空姐在西湖开心合影。" },
+  { name: "重庆", x: 500, y: 505, img: "assets/chongqing.jpg", desc: "空姐在洪崖洞开心合影。" },
+  { name: "武汉", x: 610, y: 455, img: "assets/wuhan.jpg", desc: "空姐在黄鹤楼开心合影。" },
+  { name: "西安", x: 515, y: 350, img: "assets/xian.jpg", desc: "空姐在大雁塔开心合影。" },
+  { name: "南京", x: 715, y: 420, img: "assets/nanjing.jpg", desc: "空姐在秦淮河开心合影。" },
+  { name: "苏州", x: 750, y: 440, img: "assets/suzhou.jpg", desc: "空姐在苏州园林开心合影。" },
+  { name: "天津", x: 715, y: 285, img: "assets/tianjin.jpg", desc: "空姐在海河边开心合影。" },
+  { name: "郑州", x: 600, y: 380, img: "assets/zhengzhou.jpg", desc: "空姐在二七塔开心合影。" },
+  { name: "长沙", x: 605, y: 520, img: "assets/changsha.jpg", desc: "空姐在橘子洲开心合影。" },
+  { name: "东莞", x: 640, y: 600, img: "assets/dongguan.jpg", desc: "空姐在城市广场开心合影。" },
+  { name: "青岛", x: 730, y: 340, img: "assets/qingdao.jpg", desc: "空姐在栈桥开心合影。" },
+  { name: "宁波", x: 785, y: 480, img: "assets/ningbo.jpg", desc: "空姐在天一阁开心合影。" },
+  { name: "佛山", x: 615, y: 610, img: "assets/foshan.jpg", desc: "空姐在祖庙开心合影。" },
+  { name: "合肥", x: 685, y: 435, img: "assets/hefei.jpg", desc: "空姐在逍遥津开心合影。" }
+];
+
+const map = document.getElementById("map");
+
+cities.forEach(city => {
+  const div = document.createElement("div");
+  div.className = "city " + (city.type || "");
+  div.style.left = city.x + "px";
+  div.style.top = city.y + "px";
+  div.innerText = city.name;
+  div.onclick = () => openModal(city);
+  map.appendChild(div);
+});
+
+function openModal(city) {
+  document.getElementById("cityTitle").innerText = city.name;
+  document.getElementById("cityImage").src = city.img;
+  document.getElementById("cityDesc").innerText = city.desc;
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+</script>
+
+</body>
+</html>
