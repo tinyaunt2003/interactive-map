@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<title>小姨在中国，边旅行边工作</title>
+<title>互动地图</title>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 
@@ -100,6 +100,20 @@ h1 {
   cursor: pointer;
   font-weight: bold;
 }
+
+.music-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 10px 18px;
+  border: 1px solid #00eaff;
+  border-radius: 20px;
+  background: rgba(0, 25, 45, 0.85);
+  color: #bfffff;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(0,255,255,.6);
+}
 </style>
 </head>
 
@@ -107,6 +121,12 @@ h1 {
 
 <h1>小姨在中国，边旅行边工作</h1>
 
+<audio id="bgm" src="assets/bgm.mp3" loop></audio>
+
+<button class="music-btn" onclick="toggleMusic()">
+  🎵 播放音乐
+</button>
+  
 <div class="map" id="map"></div>
 
 <div class="modal" id="modal">
@@ -164,6 +184,20 @@ function openModal(city) {
 function closeModal() {
   document.getElementById("modal").style.display = "none";
 }
+
+function toggleMusic() {
+  const bgm = document.getElementById("bgm");
+  const btn = document.querySelector(".music-btn");
+
+  if (bgm.paused) {
+    bgm.play();
+    btn.innerText = "⏸ 暂停音乐";
+  } else {
+    bgm.pause();
+    btn.innerText = "🎵 播放音乐";
+  }
+}
+
 </script>
 
 </body>
