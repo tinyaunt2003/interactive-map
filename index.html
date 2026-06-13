@@ -29,7 +29,12 @@ h1 {
   margin: 20px auto;
   border: 1px solid rgba(0,255,255,.4);
   box-shadow: 0 0 35px rgba(0,255,255,.35);
-  background: radial-gradient(circle at center, #0b314c, #020611);
+  background:
+    linear-gradient(rgba(0, 40, 70, 0.45), rgba(0, 20, 40, 0.45)),
+    url("https://upload.wikimedia.org/wikipedia/commons/7/78/China_blank_map.svg");
+  background-size: 78%;
+  background-repeat: no-repeat;
+  background-position: center;
   overflow: hidden;
 }
 
@@ -109,9 +114,7 @@ h1 {
 
 <h1>中国超一线与新一线城市互动地图</h1>
 
-<div class="map" id="map">
-  <div id="chinaMap"></div>
-</div>
+<div class="map" id="map"></div>
 
 <div class="modal" id="modal">
   <div class="card">
@@ -123,51 +126,6 @@ h1 {
 </div>
 
 <script>
-const chart = echarts.init(document.getElementById("chinaMap"));
-
-fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json")
-  .then(res => res.json())
-  .then(chinaJson => {
-    echarts.registerMap("china", chinaJson);
-
-  chart.setOption({
-    backgroundColor: "transparent",
-
-    series: [
-      {
-        type: "map",
-        map: "china",
-        roam: false,
-        zoom: 1.25,
-        center: [104, 35],
-
-        label: {
-          show: false
-        },
-
-        itemStyle: {
-          areaColor: "rgba(0, 90, 130, 0.55)",
-          borderColor: "#00eaff",
-          borderWidth: 1.4,
-          shadowColor: "#00eaff",
-          shadowBlur: 18
-        },
-
-        emphasis: {
-          label: {
-            show: false
-          },
-          itemStyle: {
-            areaColor: "rgba(0, 220, 255, 0.45)",
-            borderColor: "#ffffff",
-            borderWidth: 1.8
-          }
-        }
-      }
-    ]
-  });
-});
-
 const cities = [
   { name: "北京", type: "super", x: 690, y: 255, img: "assets/北京.png", desc: "小姨在故宫前开心合影。" },
   { name: "上海", type: "super", x: 770, y: 430, img: "assets/上海.png", desc: "小姨在外滩前开心合影。" },
